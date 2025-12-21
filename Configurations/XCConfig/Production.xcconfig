@@ -1,0 +1,31 @@
+// Configurations/Production.xcconfig
+// Configuration settings for Production environment
+
+// MARK: - Environment
+ENVIRONMENT = Production
+IS_DEBUG = NO
+
+// MARK: - App Identity
+APP_NAME = BoilerplateIOS
+APP_BUNDLE_IDENTIFIER = com.tt.studio.boilerplate-ios
+APP_VERSION = 1.0.0
+APP_BUILD_NUMBER = 1
+
+// MARK: - API Configuration
+API_BASE_URL = https:$(SLASH_ESCAPE)$(SLASH_ESCAPE)api.example.com
+API_TIMEOUT = 30
+
+// MARK: - Feature Flags
+ENABLE_LOGGING = NO
+ENABLE_ANALYTICS = YES
+ENABLE_CRASHLYTICS = YES
+
+// MARK: - Build Settings
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) PRODUCTION
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) PRODUCTION=1
+OTHER_SWIFT_FLAGS = $(inherited) -DPRODUCTION
+
+// MARK: - Code Signing (Update with your team settings)
+// CODE_SIGN_IDENTITY = Apple Distribution
+// DEVELOPMENT_TEAM = YOUR_TEAM_ID
+// PROVISIONING_PROFILE_SPECIFIER = 
