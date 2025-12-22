@@ -132,20 +132,63 @@ print_success "Project.swift app names updated"
 # Step 4: Update Project Name
 print_step "Step 4: Updating Project Name"
 
-# Update Project.swift project name
+# Update Project.swift - project name, target names, folder paths
 print_info "Updating project name in Project.swift..."
 sed -i '' "s/name: \"BoilerplateIOS\"/name: \"$NEW_PROJECT_NAME\"/g" Project.swift
-print_success "Project name updated in Project.swift"
+sed -i '' "s/BoilerplateIOS-/$NEW_PROJECT_NAME-/g" Project.swift
+sed -i '' "s/BoilerplateIOS\//$NEW_PROJECT_NAME\//g" Project.swift
+sed -i '' "s/name: \"BoilerplateIOSTests\"/name: \"${NEW_PROJECT_NAME}Tests\"/g" Project.swift
+sed -i '' "s/BoilerplateIOSTests/$NEW_PROJECT_NAMETests/g" Project.swift
+print_success "Project.swift updated"
 
 # Update Package.swift
 print_info "Updating Package.swift..."
 sed -i '' "s/name: \"BoilerplateIOS\"/name: \"$NEW_PROJECT_NAME\"/g" Tuist/Package.swift
 print_success "Package.swift updated"
 
-# Update Tuist.swift
-print_info "Updating Tuist.swift..."
-# No changes needed in Tuist.swift as it doesn't contain project name
-print_success "Tuist.swift checked"
+# Update Makefile - workspace name, scheme names, target names, comments
+print_info "Updating Makefile..."
+# Replace workspace name
+sed -i '' "s/BoilerplateIOS\.xcworkspace/$NEW_PROJECT_NAME.xcworkspace/g" Makefile
+# Replace scheme names (BoilerplateIOS-Develop, etc.)
+sed -i '' "s/-scheme BoilerplateIOS-/-scheme $NEW_PROJECT_NAME-/g" Makefile
+sed -i '' "s/BoilerplateIOS-/$NEW_PROJECT_NAME-/g" Makefile
+# Replace in comments and help text
+sed -i '' "s/BoilerplateIOS /$NEW_PROJECT_NAME /g" Makefile
+sed -i '' "s/BoilerplateIOS\$/$NEW_PROJECT_NAME/g" Makefile
+# Replace in archive paths
+sed -i '' "s/BoilerplateIOS-Develop\.xcarchive/$NEW_PROJECT_NAME-Develop.xcarchive/g" Makefile
+sed -i '' "s/BoilerplateIOS-Staging\.xcarchive/$NEW_PROJECT_NAME-Staging.xcarchive/g" Makefile
+sed -i '' "s/BoilerplateIOS-Sandbox\.xcarchive/$NEW_PROJECT_NAME-Sandbox.xcarchive/g" Makefile
+sed -i '' "s/BoilerplateIOS-Production\.xcarchive/$NEW_PROJECT_NAME-Production.xcarchive/g" Makefile
+# Replace in header comments
+sed -i '' "s/# BoilerplateIOS Makefile/# $NEW_PROJECT_NAME Makefile/g" Makefile
+sed -i '' "s/BoilerplateIOS - Tuist Commands/$NEW_PROJECT_NAME - Tuist Commands/g" Makefile
+sed -i '' "s/BoilerplateIOS - Project Info/$NEW_PROJECT_NAME - Project Info/g" Makefile
+print_success "Makefile updated"
+
+# Update test file (before folder rename)
+print_info "Updating test files..."
+if [ -f "BoilerplateIOS/Tests/BoilerplateIosTests.swift" ]; then
+    # Replace import statement (case-insensitive)
+    sed -i '' "s/@testable import BoilerplateIos/@testable import $NEW_PROJECT_NAME/g" BoilerplateIOS/Tests/BoilerplateIosTests.swift
+    sed -i '' "s/@testable import BoilerplateIOS/@testable import $NEW_PROJECT_NAME/g" BoilerplateIOS/Tests/BoilerplateIosTests.swift
+    # Replace struct name
+    sed -i '' "s/struct BoilerplateIosTests/struct ${NEW_PROJECT_NAME}Tests/g" BoilerplateIOS/Tests/BoilerplateIosTests.swift
+    print_success "Test files updated"
+fi
+
+# Update README.md
+print_info "Updating README.md..."
+if [ -f "README.md" ]; then
+    sed -i '' "s/BoilerplateIOS/$NEW_PROJECT_NAME/g" README.md
+    print_success "README.md updated"
+fi
+
+# Update setup.sh comments (for future reference)
+print_info "Updating setup.sh comments..."
+sed -i '' "s/# BoilerplateIOS Setup Script/# $NEW_PROJECT_NAME Setup Script/g" setup.sh
+print_success "setup.sh updated"
 
 # Step 5: Delete GoogleService-Info.plist files
 print_step "Step 5: Removing Firebase Configuration Files"
@@ -188,26 +231,65 @@ EOF
 done
 print_success "Placeholder Firebase files created"
 
-# Step 6: Update folder structure (if needed)
-print_step "Step 6: Checking Folder Structure"
+# Step 6: Rename BoilerplateIOS folder
+print_step "Step 6: Renaming Project Folder"
 
+if [ -d "BoilerplateIOS" ]; then
+    print_info "Renaming BoilerplateIOS folder to $NEW_PROJECT_NAME..."
+    mv "BoilerplateIOS" "$NEW_PROJECT_NAME"
+    print_success "Folder renamed from BoilerplateIOS to $NEW_PROJECT_NAME"
+    
+    # Update Project.swift with new folder path
+    print_info "Updating folder paths in Project.swift..."
+    sed -i '' "s/BoilerplateIOS\/Sources/$NEW_PROJECT_NAME\/Sources/g" Project.swift
+    sed -i '' "s/BoilerplateIOS\/Resources/$NEW_PROJECT_NAME\/Resources/g" Project.swift
+    sed -i '' "s/BoilerplateIOS\/Tests/$NEW_PROJECT_NAME\/Tests/g" Project.swift
+    print_success "Folder paths updated in Project.swift"
+    
+    # Update test files in the renamed folder
+    if [ -f "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" ]; then
+        print_info "Updating test files in renamed folder..."
+        sed -i '' "s/@testable import BoilerplateIos/@testable import $NEW_PROJECT_NAME/g" "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" 2>/dev/null || true
+        sed -i '' "s/@testable import BoilerplateIOS/@testable import $NEW_PROJECT_NAME/g" "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" 2>/dev/null || true
+        sed -i '' "s/struct BoilerplateIosTests/struct ${NEW_PROJECT_NAME}Tests/g" "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" 2>/dev/null || true
+        # Rename test file if needed
+        if [ -f "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" ] && [ ! -f "$NEW_PROJECT_NAME/Tests/${NEW_PROJECT_NAME}Tests.swift" ]; then
+            mv "$NEW_PROJECT_NAME/Tests/BoilerplateIosTests.swift" "$NEW_PROJECT_NAME/Tests/${NEW_PROJECT_NAME}Tests.swift" 2>/dev/null || true
+        fi
+        print_success "Test files updated in renamed folder"
+    fi
+else
+    print_warning "BoilerplateIOS folder not found, skipping rename"
+fi
+
+# Check root folder name
 CURRENT_FOLDER=$(basename "$PROJECT_ROOT")
 if [ "$CURRENT_FOLDER" != "$NEW_PROJECT_NAME" ]; then
-    print_warning "Current folder name is '$CURRENT_FOLDER' but project name is '$NEW_PROJECT_NAME'"
-    print_info "You may want to rename the project folder manually:"
+    print_warning "Current root folder name is '$CURRENT_FOLDER' but project name is '$NEW_PROJECT_NAME'"
+    print_info "You may want to rename the root folder manually:"
     echo "  cd .."
     echo "  mv $CURRENT_FOLDER $NEW_PROJECT_NAME"
     echo "  cd $NEW_PROJECT_NAME"
 else
-    print_success "Folder name matches project name"
+    print_success "Root folder name matches project name"
 fi
 
-# Step 7: Update README files
-print_step "Step 7: Updating Documentation"
+# Step 7: Final comprehensive replacement
+print_step "Step 7: Final Comprehensive Replacement"
 
-# Update main README if exists
+# Replace any remaining instances of BoilerplateIOS in all Swift files
+print_info "Replacing remaining BoilerplateIOS references in Swift files..."
+find . -type f -name "*.swift" -not -path "./.git/*" -not -path "./Tuist/.build/*" -exec sed -i '' "s/BoilerplateIOS/$NEW_PROJECT_NAME/g" {} \;
+print_success "Swift files updated"
+
+# Replace in XCConfig files (comprehensive)
+print_info "Replacing BoilerplateIOS in XCConfig files..."
+find Configurations/XCConfig -name "*.xcconfig" -type f -exec sed -i '' "s/BoilerplateIOS/$NEW_PROJECT_NAME/g" {} \;
+print_success "XCConfig files updated"
+
+# Update README.md (if not already updated)
 if [ -f "README.md" ]; then
-    print_info "Updating README.md..."
+    print_info "Final update to README.md..."
     sed -i '' "s/BoilerplateIOS/$NEW_PROJECT_NAME/g" README.md 2>/dev/null || true
     sed -i '' "s/Boilerplate/$NEW_APP_NAME/g" README.md 2>/dev/null || true
     print_success "README.md updated"
@@ -265,6 +347,12 @@ echo ""
 echo -e "${YELLOW}7. Build and Run:${NC}"
 echo "   • Select a scheme (e.g., $NEW_PROJECT_NAME-Develop)"
 echo "   • Build and run (Cmd+R)"
+echo ""
+
+echo -e "${YELLOW}8. Verify Changes:${NC}"
+echo "   • Check that all 'BoilerplateIOS' references have been replaced"
+echo "   • Verify Makefile commands use '$NEW_PROJECT_NAME'"
+echo "   • Confirm folder structure is correct"
 echo ""
 
 if [ "$CURRENT_FOLDER" != "$NEW_PROJECT_NAME" ]; then
