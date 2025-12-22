@@ -2,19 +2,9 @@ import UIKit
 import SwiftUI
 import Core
 
-final class SettingCoordinator: Coordinator {
-    var navigationController: UINavigationController
-    var childCoordinators: [Coordinator] = []
+final class SettingCoordinator: BaseCoordinator {
     
-    // Parent coordinator to handle removal when finished
-    private weak var parentCoordinator: HomeCoordinator?
-    
-    init(navigationController: UINavigationController, parentCoordinator: HomeCoordinator) {
-        self.navigationController = navigationController
-        self.parentCoordinator = parentCoordinator
-    }
-    
-    func start() {
+    override func start() {
         let viewModel = SettingViewModel()
         viewModel.coordinator = self
         let settingView = SettingView(viewModel: viewModel)
@@ -23,13 +13,13 @@ final class SettingCoordinator: Coordinator {
         hostingController.title = "Settings"
         
         // Since we are starting a new navigation stack (modal), we set it as root
-        replaceAll(with: hostingController, animated: false)
+        navigationController.setViewControllers([hostingController], animated: false)
     }
     
-    func finish() {
+    override func finish() {
         // Dismiss the presented navigation controller
         navigationController.dismiss(animated: true)
         // Remove self from parent
-        parentCoordinator?.removeChildCoordinator(self)
+        super.finish()
     }
 }

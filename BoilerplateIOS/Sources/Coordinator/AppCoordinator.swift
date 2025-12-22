@@ -2,18 +2,16 @@ import UIKit
 import Core
 
 /// Main App Coordinator manages the entire app flow
-final class AppCoordinator: Coordinator {
-    var navigationController: UINavigationController
-    var childCoordinators: [Coordinator] = []
+final class AppCoordinator: BaseCoordinator {
     
     private let window: UIWindow
     
     init(window: UIWindow) {
         self.window = window
-        self.navigationController = UINavigationController()
+        super.init(navigationController: UINavigationController())
     }
     
-    func start() {
+    override func start() {
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         
@@ -21,9 +19,9 @@ final class AppCoordinator: Coordinator {
         showMainFlow()
     }
     
-    func finish() {
+    override func finish() {
         // Cleanup if needed
-        removeAllChildCoordinators()
+        super.finish()
     }
     
     // MARK: - Private Methods

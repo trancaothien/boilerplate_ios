@@ -3,18 +3,9 @@ import SwiftUI
 import Core
 
 /// Splash Coordinator manages splash screen flow
-final class SplashCoordinator: Coordinator {
-    var navigationController: UINavigationController
-    var childCoordinators: [Coordinator] = []
+final class SplashCoordinator: BaseCoordinator {
     
-    private weak var parentCoordinator: AppCoordinator?
-    
-    init(navigationController: UINavigationController, parentCoordinator: AppCoordinator) {
-        self.navigationController = navigationController
-        self.parentCoordinator = parentCoordinator
-    }
-    
-    func start() {
+    override func start() {
         let viewModel = SplashViewModel()
         viewModel.onFinish = { [weak self] in
             self?.showHome()
@@ -25,11 +16,7 @@ final class SplashCoordinator: Coordinator {
         hostingController.view.backgroundColor = .clear
         
         // Use replaceAll to set splash as root
-        replaceAll(with: hostingController, animated: false)
-    }
-    
-    func finish() {
-        parentCoordinator?.removeChildCoordinator(self)
+        navigationController.setViewControllers([hostingController], animated: false)
     }
     
     // MARK: - Private Methods

@@ -44,8 +44,8 @@ final class HomeViewModel: BaseViewModel {
         coordinator?.showSettings()
     }
     
-    func goBack() {
-        coordinator?.goBack()
+    func showProfile() {
+        coordinator?.showProfile()
     }
 }
 

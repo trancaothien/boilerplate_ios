@@ -3,7 +3,7 @@ import Core
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
-    @State private var showingAlert = false
+
     
     init(viewModel: HomeViewModel = HomeViewModel()) {
         self.viewModel = viewModel
@@ -48,7 +48,7 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -60,17 +60,13 @@ struct HomeView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        showingAlert = true
+                        viewModel.showProfile()
                     } label: {
                         Image(systemName: "person.circle")
                     }
                 }
             }
-            .alert("Profile", isPresented: $showingAlert) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text("Hello, \(viewModel.userName)!")
-            }
+
         }
         .loading(viewModel.isLoading)
         .errorAlert(errorMessage: $viewModel.errorMessage)
