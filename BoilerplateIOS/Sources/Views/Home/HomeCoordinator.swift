@@ -38,9 +38,16 @@ final class HomeCoordinator: Coordinator {
     
     /// Show settings screen modally
     func showSettings() {
-        // Example: Present a modal with page sheet style
-        // let settingsView = SettingsView()
-        // present(settingsView, configuration: .pageSheet)
+        let settingsNavController = UINavigationController()
+        
+        let settingsCoordinator = SettingCoordinator(
+            navigationController: settingsNavController,
+            parentCoordinator: self
+        )
+        addChildCoordinator(settingsCoordinator)
+        settingsCoordinator.start()
+        
+        present(settingsNavController, configuration: .pageSheet)
     }
     
     /// Show full screen modal
