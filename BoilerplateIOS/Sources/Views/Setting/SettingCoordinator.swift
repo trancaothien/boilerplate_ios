@@ -2,24 +2,35 @@ import UIKit
 import SwiftUI
 import Core
 
-final class SettingCoordinator: BaseCoordinator {
+/// Setting Coordinator manages settings screen flow
+final class SettingCoordinator: BaseCoordinator, SettingNavigationDelegate {
     
     override func start() {
         let viewModel = SettingViewModel()
-        viewModel.coordinator = self
+        
+        // Setup navigation delegate
+        viewModel.navigationDelegate = self
+        
         let settingView = SettingView(viewModel: viewModel)
         
-        let hostingController = UIHostingController(rootView: settingView)
-        hostingController.title = "Settings"
-        
         // Since we are starting a new navigation stack (modal), we set it as root
-        navigationController.setViewControllers([hostingController], animated: false)
+        replaceAll(with: settingView, animated: false)
+    }
+    
+    // MARK: - SettingNavigationDelegate
+    
+    func dismissSettings() {
+        finish()
     }
     
     override func finish() {
         // Dismiss the presented navigation controller
-        navigationController.dismiss(animated: true)
-        // Remove self from parent
-        super.finish()
+        dismiss(animated: true) { [weak self] in
+            // Remove self from parent after dismiss completes
+            guard let self = self else { return }
+            // Clean up children and remove from parent
+            self.removeAllChildCoordinators()
+            self.parentCoordinator?.removeChildCoordinator(self)
+        }
     }
 }

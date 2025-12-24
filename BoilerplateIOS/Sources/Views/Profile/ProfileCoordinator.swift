@@ -2,15 +2,25 @@ import UIKit
 import SwiftUI
 import Core
 
-final class ProfileCoordinator: BaseCoordinator {
+/// Profile Coordinator manages profile screen flow
+final class ProfileCoordinator: BaseCoordinator, ProfileNavigationDelegate {
     
     override func start() {
         let viewModel = ProfileViewModel()
-        viewModel.coordinator = self
+        
+        // Setup navigation delegate
+        viewModel.navigationDelegate = self
+        
         let profileView = ProfileView(viewModel: viewModel)
         
         // Push the profile view onto the navigation stack
-        let hostingController = UIHostingController(rootView: profileView)
-        navigationController.pushViewController(hostingController, animated: true)
+        push(profileView)
+    }
+    
+    // MARK: - ProfileNavigationDelegate
+    
+    func editProfile() {
+        // Handle edit profile action
+        // showEditProfile()
     }
 }

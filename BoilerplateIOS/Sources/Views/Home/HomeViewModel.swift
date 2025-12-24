@@ -2,12 +2,23 @@ import Foundation
 import Core
 import Combine
 
+/// Protocol định nghĩa các navigation actions cho Home screen
+protocol HomeNavigationDelegate: AnyObject {
+    func showDetail(for item: Item)
+    func showSettings()
+    func showProfile()
+    func showPageSheetModal()
+    func showFullScreenModal()
+    func showFormSheetModal()
+    func showCustomModal()
+}
+
 final class HomeViewModel: BaseViewModel {
-    @Published var items: [String] = []
+    @Published var items: [Item] = []
     @Published var userName: String = "User"
     
-    // MARK: - Coordinator
-    weak var coordinator: HomeCoordinator?
+    // MARK: - Navigation Delegate
+    weak var navigationDelegate: HomeNavigationDelegate?
     
     override func setupBindings() {
         loadData()
@@ -19,11 +30,57 @@ final class HomeViewModel: BaseViewModel {
         // Simulate API call
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.items = [
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4",
-                "Item 5"
+                Item(
+                    id: 1,
+                    name: "Item 1",
+                    isFavorite: true,
+                    createdDate: Date().addingTimeInterval(-86400 * 1),
+                    metadata: ItemMetadata(
+                        category: "Technology",
+                        tags: ["iOS", "Swift", "Demo"],
+                        priority: "High"
+                    )
+                ),
+                Item(
+                    id: 2,
+                    name: "Item 2",
+                    isFavorite: false,
+                    createdDate: Date().addingTimeInterval(-86400 * 2),
+                    metadata: ItemMetadata(
+                        category: "Design",
+                        tags: ["UI", "UX"],
+                        priority: "Medium"
+                    )
+                ),
+                Item(
+                    id: 3,
+                    name: "Item 3",
+                    isFavorite: true,
+                    createdDate: Date().addingTimeInterval(-86400 * 3),
+                    metadata: nil
+                ),
+                Item(
+                    id: 4,
+                    name: "Item 4",
+                    isFavorite: false,
+                    createdDate: Date().addingTimeInterval(-86400 * 4),
+                    metadata: ItemMetadata(
+                        category: "Business",
+                        tags: ["Strategy"],
+                        priority: "Low"
+                    )
+                ),
+                Item(
+                    id: 5,
+                    name: "Item 5",
+                    isFavorite: true,
+                    createdDate: Date().addingTimeInterval(-86400 * 5),
+                    metadata: ItemMetadata(
+                        category: "Development",
+                        tags: ["Backend", "API"],
+                        priority: "High"
+                    )
+                )
             ]
             self?.setLoading(false)
         }
@@ -36,16 +93,36 @@ final class HomeViewModel: BaseViewModel {
     
     // MARK: - Navigation Actions
     
-    func showDetail(for item: String) {
-        coordinator?.showDetail(for: item)
+    /// Truyền params từ Home sang Detail
+    /// Có thể truyền nhiều loại params: String, Int, Bool, Date, Custom Object
+    func showDetail(for item: Item) {
+        navigationDelegate?.showDetail(for: item)
     }
     
     func showSettings() {
-        coordinator?.showSettings()
+        navigationDelegate?.showSettings()
     }
     
     func showProfile() {
-        coordinator?.showProfile()
+        navigationDelegate?.showProfile()
+    }
+    
+    // MARK: - ModalConfiguration Demo Actions
+    
+    func showPageSheetModal() {
+        navigationDelegate?.showPageSheetModal()
+    }
+    
+    func showFullScreenModal() {
+        navigationDelegate?.showFullScreenModal()
+    }
+    
+    func showFormSheetModal() {
+        navigationDelegate?.showFormSheetModal()
+    }
+    
+    func showCustomModal() {
+        navigationDelegate?.showCustomModal()
     }
 }
 

@@ -1,214 +1,235 @@
-# Hướng dẫn sử dụng Coordinator Pattern
+# Hướng dẫn sử dụng Coordinator Methods
 
-Dự án này sử dụng mô hình **MVVM-C (Model-View-ViewModel-Coordinator)** để quản lý luồng điều hướng của ứng dụng. Tài liệu này hướng dẫn cách tạo màn hình mới và sử dụng các tính năng điều hướng.
+## 1. Child Coordinator Management (Lines 43-63)
 
-## 1. Cấu trúc
+**Khi nào sử dụng:**
+- Khi bạn tạo một **Child Coordinator** để quản lý một flow mới
+- Dùng để quản lý lifecycle của các coordinator con
+- Đảm bảo memory management đúng cách
 
-Mọi Coordinator trong ứng dụng đều kế thừa từ `BaseCoordinator` (hoặc implement protocol `Coordinator`).
-`BaseCoordinator` đã xử lý sẵn việc quản lý `navigationController` và `childCoordinators`.
+**Các methods:**
+- `addChildCoordinator(_:)` - Thêm coordinator con
+- `removeChildCoordinator(_:)` - Xóa coordinator con cụ thể
+- `removeAllChildCoordinators()` - Xóa tất cả coordinator con
+- `findChildCoordinator<T>(ofType:)` - Tìm coordinator con theo type
 
-## 2. Cách tạo một màn hình mới
-
-Để tạo một tính năng/màn hình mới (ví dụ: `Profile`), bạn cần tạo 3 thành phần: View, ViewModel, và Coordinator.
-
-### Bước 1: Tạo Coordinator
-
-Tạo file `ProfileCoordinator.swift` kế thừa từ `BaseCoordinator`.
-
-```swift
-import UIKit
-import Core
-
-final class ProfileCoordinator: BaseCoordinator {
-    
-    override func start() {
-        // Khởi tạo ViewModel và View
-        let viewModel = ProfileViewModel()
-        viewModel.coordinator = self // Gán coordinator cho VM để xử lý action
-        
-        let view = ProfileView(viewModel: viewModel)
-        
-        // Push màn hình vào stack
-        push(view, animated: true)
-    }
-}
-```
-
-### Bước 2: Tạo ViewModel
-
-Tạo file `ProfileViewModel.swift`. ViewModel nên giữ reference `weak` tới Coordinator.
+**Ví dụ từ codebase:**
 
 ```swift
-import Foundation
-import Core
-
-final class ProfileViewModel: BaseViewModel {
-    // Reference yếu tới Coordinator để tránh retain cycle
-    weak var coordinator: ProfileCoordinator?
-    
-    func openDetail() {
-        coordinator?.showDetail()
-    }
-    
-    func goBack() {
-        coordinator?.goBack()
-    }
-}
-```
-
-### Bước 3: Tạo View
-
-Tạo file `ProfileView.swift` (SwiftUI).
-
-```swift
-import SwiftUI
-
-struct ProfileView: View {
-    @ObservedObject var viewModel: ProfileViewModel
-    
-    var body: some View {
-        Button("Open Detail") {
-            viewModel.openDetail()
-        }
-    }
-}
-```
-
-## 3. Cách điều hướng (Navigation)
-
-Việc điều hướng **phải** được thực hiện trong class `Coordinator`, không thực hiện trực tiếp trong View hay ViewModel.
-
-### Push một màn hình mới
-
-Có 2 cách để điều hướng sang màn hình mới, tuỳ thuộc vào độ phức tạp của màn hình đó:
-
-#### Cách 1: Màn hình thuộc một Flow phức tạp (Dùng Child Coordinator)
-Nếu màn hình mới bắt đầu một luồng chức năng lớn (ví dụ `Profile`, `Settings`), hãy tạo Coordinator riêng:
-
-```swift
-func showProfile() {
-    let profileCoordinator = ProfileCoordinator(
+// Trong HomeCoordinator.showDetail()
+func showDetail(...) {
+    // Tạo child coordinator
+    let detailCoordinator = DetailCoordinator(
         navigationController: navigationController,
+        parentCoordinator: self,
+        itemName: itemName,
+        // ... params
+    )
+    
+    // ✅ PHẢI thêm vào child coordinators
+    addChildCoordinator(detailCoordinator)
+    detailCoordinator.start()
+}
+
+// Trong HomeCoordinator.showSettings()
+func showSettings() {
+    let settingsNavController = UINavigationController()
+    let settingsCoordinator = SettingCoordinator(
+        navigationController: settingsNavController,
         parentCoordinator: self
     )
-    addChildCoordinator(profileCoordinator)
-    profileCoordinator.start() 
-    // Bên trong hàm start() của ProfileCoordinator sẽ gọi lệnh push() để hiển thị view
-}
-```
-
-#### Cách 2: Màn hình đơn giản (Dùng trực tiếp Push)
-Nếu màn hình chỉ là xem chi tiết đơn giản (ví dụ `DetailView`), không có nhiều logic điều hướng tiếp, bạn không cần tạo Coordinator mới:
-
-```swift
-func showDetail(id: String) {
-    let viewModel = DetailViewModel(id: id)
-    let view = DetailView(viewModel: viewModel)
     
-    // Push trực tiếp trong Coordinator hiện tại
-    push(view)
+    // ✅ PHẢI thêm vào child coordinators
+    addChildCoordinator(settingsCoordinator)
+    settingsCoordinator.start()
+    
+    present(settingsNavController, configuration: .pageSheet)
 }
 ```
 
-### Pop (Back) về màn hình trước
+**Lưu ý:**
+- ✅ **LUÔN** gọi `addChildCoordinator()` khi tạo coordinator mới
+- ✅ Coordinator con sẽ tự động được remove khi gọi `finish()`
+- ❌ Không cần gọi khi chỉ push một view đơn giản (không có coordinator riêng)
+
+---
+
+## 2. Navigation Methods (Lines 100-124)
+
+**Khi nào sử dụng:**
+- Khi điều hướng trong **cùng một navigation stack**
+- Push/pop màn hình trong cùng một flow
+- Sử dụng khi màn hình được quản lý bởi cùng một `UINavigationController`
+
+**Các methods:**
+- `push(_:animated:)` - Push view/viewController lên stack
+- `pop(animated:)` - Pop về màn hình trước
+- `popToRoot(animated:)` - Pop về màn hình đầu tiên
+
+**Ví dụ từ codebase:**
 
 ```swift
-// Trong ProfileCoordinator
-func goBack() {
-    pop() // Tương đương navigationController.popViewController
-    // Nếu màn hình này finish luồng, gọi thêm finish()
-    finish()
+// Trong DetailCoordinator.start()
+override func start() {
+    let viewModel = DetailViewModel(...)
+    viewModel.coordinator = self
+    let detailView = DetailView(viewModel: viewModel)
+    
+    // ✅ Sử dụng push() vì Detail nằm trong cùng navigation stack với Home
+    push(detailView)
+}
+
+// Trong ProfileCoordinator.start() (nếu có)
+override func start() {
+    let viewModel = ProfileViewModel()
+    viewModel.coordinator = self
+    let profileView = ProfileView(viewModel: viewModel)
+    
+    // ✅ Sử dụng push() vì Profile nằm trong cùng navigation stack
+    push(profileView)
 }
 ```
 
-## 4. Hiển thị Modal & Bottom Sheet
+**Khi KHÔNG sử dụng:**
+- ❌ Khi màn hình là modal (dùng `present()` thay vì `push()`)
+- ❌ Khi màn hình có navigation controller riêng (dùng `present()` với nav controller)
 
-Sử dụng hàm `present` có sẵn trong `Coordinator`.
+**So sánh:**
 
-### Hiển thị Modal (Bottom Sheet - PageSheet)
+| Tình huống | Method | Ví dụ |
+|------------|--------|-------|
+| Màn hình trong cùng stack | `push()` | Home → Detail |
+| Màn hình là modal | `present()` | Home → Settings (modal) |
+| Màn hình có nav riêng | `present()` với nav controller | Settings modal |
 
-Để hiển thị một màn hình dưới dạng modal (ví dụ `Settings`), bạn nên tạo một `UINavigationController` riêng cho nó nếu nó có luồng riêng.
+---
+
+## 3. Modal Presentation Methods (Lines 67-97)
+
+**Khi nào sử dụng:**
+- Khi hiển thị màn hình dưới dạng **modal** (bottom sheet, full screen modal)
+- Khi màn hình có **navigation controller riêng**
+- Khi muốn hiển thị màn hình **độc lập** với navigation stack hiện tại
+
+**Các methods:**
+- `present(_:configuration:animated:completion:)` - Present view/viewController modally
+- `dismiss(animated:completion:)` - Dismiss modal hiện tại
+
+**Ví dụ từ codebase:**
+
+### Ví dụ 1: Present với Navigation Controller riêng
 
 ```swift
+// Trong HomeCoordinator.showSettings()
 func showSettings() {
-    // Tạo NavController riêng cho modal
+    // Tạo navigation controller riêng cho modal
     let settingsNavController = UINavigationController()
     
     let settingsCoordinator = SettingCoordinator(
         navigationController: settingsNavController,
         parentCoordinator: self
     )
-    
     addChildCoordinator(settingsCoordinator)
     settingsCoordinator.start()
     
-    // Present modal với style pageSheet (mặc định của iOS 13+)
+    // ✅ Sử dụng present() vì Settings là modal với nav controller riêng
     present(settingsNavController, configuration: .pageSheet)
 }
 ```
 
-Cấu hình `configuration` hỗ trợ:
-- `.pageSheet`: Dạng thẻ kéo được (mặc định).
-- `.fullScreen`: Tràn màn hình.
-- `.formSheet`: Dạng form (thường dùng trên iPad).
+### Ví dụ 2: Present view đơn giản (không có coordinator)
 
-## 5. Các lệnh điều hướng cơ bản
-
-Base Coordinator cung cấp sẵn các wrapper cho `UINavigationController`:
-
-| Hàm | Mô tả |
-| --- | --- |
-| `push(view)` | Push một SwiftUI View. |
-| `push(viewController)` | Push một UIViewController. |
-| `pop()` | Back về màn hình trước đó. |
-| `popToRoot()` | Back về màn hình đầu tiên của stack. |
-| `replaceAll(with: view)` | Reset stack, đặt view này làm root (dùng cho Splash -> Home). |
-| `present(view/vc)` | Hiển thị modal. |
-| `dismiss()` | Ẩn modal hiện tại. |
-
-## 6. Xử lý Custom Navigation Bar
-
-Nếu muốn ẩn Navigation Bar mặc định của iOS và dùng Custom Header:
-
-Trong `Coordinator`:
 ```swift
-func start() {
-    let view = MyView()
-    push(view)
-}
-
-func goBack() {
-    pop()
-}
-```
-
-Trong `View`:
-```swift
-var body: some View {
-    VStack {
-        // Header tự custom
-        HStack {
-            Button(action: { viewModel.goBack() }) {
-                Image(systemName: "chevron.left")
-            }
+// Trong HomeCoordinator.showPageSheetModal()
+func showPageSheetModal() {
+    let demoView = ModalDemoView(
+        title: "Page Sheet Modal",
+        description: "...",
+        onDismiss: { [weak self] in
+            // ✅ Sử dụng dismiss() để đóng modal
+            self?.dismiss()
         }
-        // Content
-    }
-    .navigationBarHidden(true) // Ẩn nav bar mặc định
+    )
+    
+    // ✅ Sử dụng present() vì đây là modal đơn giản
+    present(demoView, configuration: .pageSheet)
 }
 ```
 
-## 7. Kết thúc Coordinator
-
-Khi một flow kết thúc (ví dụ đóng Modal Settings), cần gọi hàm `finish()` để:
-1. `dismiss` view (nếu cần).
-2. Xoá coordinator con khỏi coordinator cha.
-3. Xoá tất cả coordinator cháu.
+### Ví dụ 3: Dismiss modal
 
 ```swift
-// Trong SettingCoordinator
-override func finish() {
-    navigationController.dismiss(animated: true)
-    super.finish() // Quan trọng: gọi super để xoá khỏi parent
+// Trong ViewModel hoặc View
+func closeModal() {
+    coordinator?.dismiss() // ✅ Đóng modal hiện tại
 }
 ```
+
+**Các loại ModalConfiguration:**
+
+```swift
+// Bottom sheet (có thể kéo xuống)
+present(view, configuration: .pageSheet)
+
+// Full screen
+present(view, configuration: .fullScreen)
+
+// Form sheet (thường dùng trên iPad)
+present(view, configuration: .formSheet)
+
+// Custom configuration
+let config = ModalConfiguration(
+    presentationStyle: .pageSheet,
+    transitionStyle: .flipHorizontal,
+    isModalInPresentation: true
+)
+present(view, configuration: config)
+```
+
+---
+
+## Tóm tắt: Khi nào dùng gì?
+
+### Scenario 1: Màn hình trong cùng navigation stack
+```swift
+// ✅ Dùng push() + addChildCoordinator()
+let detailCoordinator = DetailCoordinator(...)
+addChildCoordinator(detailCoordinator)
+detailCoordinator.start() // Bên trong start() sẽ gọi push()
+```
+
+### Scenario 2: Màn hình modal với nav controller riêng
+```swift
+// ✅ Dùng present() + addChildCoordinator()
+let settingsNavController = UINavigationController()
+let settingsCoordinator = SettingCoordinator(
+    navigationController: settingsNavController,
+    parentCoordinator: self
+)
+addChildCoordinator(settingsCoordinator)
+settingsCoordinator.start()
+present(settingsNavController, configuration: .pageSheet)
+```
+
+### Scenario 3: Màn hình modal đơn giản (không có coordinator)
+```swift
+// ✅ Dùng present() (không cần addChildCoordinator)
+let modalView = SimpleModalView()
+present(modalView, configuration: .pageSheet)
+```
+
+### Scenario 4: Đóng modal
+```swift
+// ✅ Dùng dismiss()
+dismiss()
+```
+
+---
+
+## Checklist khi tạo navigation mới
+
+- [ ] Màn hình có coordinator riêng? → Dùng `addChildCoordinator()`
+- [ ] Màn hình trong cùng stack? → Dùng `push()`
+- [ ] Màn hình là modal? → Dùng `present()`
+- [ ] Modal có nav controller riêng? → Tạo `UINavigationController` mới
+- [ ] Cần đóng modal? → Dùng `dismiss()`

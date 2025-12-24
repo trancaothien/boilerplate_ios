@@ -2,17 +2,22 @@ import Foundation
 import Core
 import Combine
 
+/// Protocol định nghĩa các navigation actions cho Splash screen
+protocol SplashNavigationDelegate: AnyObject {
+    func onFinish()
+}
+
 final class SplashViewModel: BaseViewModel {
     @Published var isFinished: Bool = false
     
-    /// Callback when splash screen finishes
-    var onFinish: (() -> Void)?
+    // MARK: - Navigation Delegate
+    weak var navigationDelegate: SplashNavigationDelegate?
     
     override func setupBindings() {
         // Simulate splash screen delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
             self?.isFinished = true
-            self?.onFinish?()
+            self?.navigationDelegate?.onFinish()
         }
     }
 }

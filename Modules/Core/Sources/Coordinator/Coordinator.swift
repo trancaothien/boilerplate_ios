@@ -1,10 +1,6 @@
 import UIKit
 import SwiftUI
 
-
-
-// MARK: - Presentation Style
-
 /// Modal presentation configuration
 public struct ModalConfiguration {
     public let presentationStyle: UIModalPresentationStyle
@@ -26,8 +22,6 @@ public struct ModalConfiguration {
     public static let pageSheet = ModalConfiguration(presentationStyle: .pageSheet)
     public static let formSheet = ModalConfiguration(presentationStyle: .formSheet)
 }
-
-// MARK: - Coordinator Protocol
 
 /// Protocol defining interface for Coordinator pattern
 public protocol Coordinator: AnyObject {
@@ -68,7 +62,73 @@ public extension Coordinator {
     }
 }
 
+// MARK: - Modal Presentation
 
+public extension Coordinator {
+    /// Present a SwiftUI view modally with configuration
+    func present(
+        _ view: some View,
+        configuration: ModalConfiguration = .default,
+        animated: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
+        let hostingController = UIHostingController(rootView: view)
+        present(hostingController, configuration: configuration, animated: animated, completion: completion)
+    }
+    
+    /// Present a view controller modally with configuration
+    func present(
+        _ viewController: UIViewController,
+        configuration: ModalConfiguration = .default,
+        animated: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
+        viewController.modalPresentationStyle = configuration.presentationStyle
+        viewController.modalTransitionStyle = configuration.transitionStyle
+        viewController.isModalInPresentation = configuration.isModalInPresentation
+        
+        navigationController.present(viewController, animated: animated, completion: completion)
+    }
+    
+    /// Dismiss the currently presented modal
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
+        navigationController.dismiss(animated: animated, completion: completion)
+    }
+}
 
+// MARK: - Navigation
 
+public extension Coordinator {
+    /// Push a SwiftUI view onto the navigation stack
+    func push(_ view: some View, animated: Bool = true) {
+        let hostingController = UIHostingController(rootView: view)
+        push(hostingController, animated: animated)
+    }
+    
+    /// Push a view controller onto the navigation stack
+    func push(_ viewController: UIViewController, animated: Bool = true) {
+        navigationController.pushViewController(viewController, animated: animated)
+    }
+    
+    /// Pop the top view controller from the navigation stack
+    func pop(animated: Bool = true) {
+        navigationController.popViewController(animated: animated)
+    }
+    
+    /// Pop to the root view controller
+    func popToRoot(animated: Bool = true) {
+        navigationController.popToRootViewController(animated: animated)
+    }
+    
+    /// Replace all view controllers with a new SwiftUI view (set as root)
+    func replaceAll(with view: some View, animated: Bool = false) {
+        let hostingController = UIHostingController(rootView: view)
+        replaceAll(with: hostingController, animated: animated)
+    }
+    
+    /// Replace all view controllers with a new view controller (set as root)
+    func replaceAll(with viewController: UIViewController, animated: Bool = false) {
+        navigationController.setViewControllers([viewController], animated: animated)
+    }
+}
 

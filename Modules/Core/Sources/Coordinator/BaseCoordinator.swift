@@ -1,5 +1,4 @@
 import UIKit
-import Core
 
 /// Base class for all coordinators to reduce boilerplate
 open class BaseCoordinator: Coordinator {
@@ -29,3 +28,4 @@ open class BaseCoordinator: Coordinator {
         parentCoordinator?.removeChildCoordinator(self)
     }
 }
+
