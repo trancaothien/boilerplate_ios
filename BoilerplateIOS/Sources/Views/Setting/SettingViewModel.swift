@@ -2,7 +2,7 @@ import Foundation
 import Core
 import Combine
 
-/// Protocol định nghĩa các navigation actions cho Setting screen
+/// Protocol that defines navigation actions for Setting screen
 protocol SettingNavigationDelegate: AnyObject {
     func dismissSettings()
 }

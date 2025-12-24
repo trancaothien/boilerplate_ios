@@ -31,9 +31,9 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
     
     // MARK: - Navigation Examples
     
-    /// Show detail screen với params từ màn hình Home
-    /// Demo cách truyền nhiều loại params: String, Int, Bool, Date, Custom Object
-    /// Sử dụng DetailCoordinator để quản lý flow của màn hình Detail
+    /// Show detail screen with params from Home screen
+    /// Demo passing multiple param types: String, Int, Bool, Date, Custom Object
+    /// Uses DetailCoordinator to manage Detail screen flow
     private func showDetail(
         itemName: String,
         itemId: Int,
@@ -41,7 +41,7 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
         createdDate: Date,
         metadata: ItemMetadata?
     ) {
-        // Tạo DetailCoordinator với params
+        // Create DetailCoordinator with params
         let detailCoordinator = DetailCoordinator(
             navigationController: navigationController,
             parentCoordinator: self,
@@ -52,7 +52,7 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
             metadata: metadata
         )
         
-        // Thêm vào child coordinators và start
+        // Add to child coordinators and start
         addChildCoordinator(detailCoordinator)
         detailCoordinator.start()
     }
@@ -68,7 +68,7 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
         addChildCoordinator(settingsCoordinator)
         settingsCoordinator.start()
         
-        // Sử dụng ModalConfiguration.pageSheet để hiển thị dạng bottom sheet
+        // Use ModalConfiguration.pageSheet to display as bottom sheet
         present(settingsNavController, configuration: .pageSheet)
     }
     
@@ -84,11 +84,11 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
     
     // MARK: - ModalConfiguration Demo Methods
     
-    /// Demo: Hiển thị modal với style pageSheet (bottom sheet)
+    /// Demo: Display modal with pageSheet style (bottom sheet)
     func showPageSheetModal() {
         let demoView = ModalDemoView(
             title: "Page Sheet Modal",
-            description: "Đây là modal dạng page sheet (bottom sheet), có thể kéo xuống để đóng.",
+            description: "This is a page sheet modal (bottom sheet), can swipe down to dismiss.",
             onDismiss: { [weak self] in
                 self?.dismiss()
             }
@@ -96,11 +96,11 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
         present(demoView, configuration: .pageSheet)
     }
     
-    /// Demo: Hiển thị modal với style fullScreen
+    /// Demo: Display modal with fullScreen style
     func showFullScreenModal() {
         let demoView = ModalDemoView(
             title: "Full Screen Modal",
-            description: "Đây là modal dạng full screen, chiếm toàn bộ màn hình.",
+            description: "This is a full screen modal, takes up the entire screen.",
             onDismiss: { [weak self] in
                 self?.dismiss()
             }
@@ -108,11 +108,11 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
         present(demoView, configuration: .fullScreen)
     }
     
-    /// Demo: Hiển thị modal với style formSheet
+    /// Demo: Display modal with formSheet style
     func showFormSheetModal() {
         let demoView = ModalDemoView(
             title: "Form Sheet Modal",
-            description: "Đây là modal dạng form sheet, thường dùng trên iPad.",
+            description: "This is a form sheet modal, commonly used on iPad.",
             onDismiss: { [weak self] in
                 self?.dismiss()
             }
@@ -120,16 +120,16 @@ final class HomeCoordinator: BaseCoordinator, HomeNavigationDelegate {
         present(demoView, configuration: .formSheet)
     }
     
-    /// Demo: Hiển thị modal với custom configuration
+    /// Demo: Display modal with custom configuration
     func showCustomModal() {
         let customConfig = ModalConfiguration(
             presentationStyle: .pageSheet,
             transitionStyle: .flipHorizontal,
-            isModalInPresentation: true // Không cho phép swipe down để dismiss
+            isModalInPresentation: true // Prevent swipe down to dismiss
         )
         let demoView = ModalDemoView(
             title: "Custom Modal",
-            description: "Đây là modal với custom configuration:\n- Presentation: Page Sheet\n- Transition: Flip Horizontal\n- isModalInPresentation: true (không thể swipe down)",
+            description: "This is a modal with custom configuration:\n- Presentation: Page Sheet\n- Transition: Flip Horizontal\n- isModalInPresentation: true (cannot swipe down)",
             onDismiss: { [weak self] in
                 self?.dismiss()
             }

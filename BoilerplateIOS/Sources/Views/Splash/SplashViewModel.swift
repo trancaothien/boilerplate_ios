@@ -2,7 +2,7 @@ import Foundation
 import Core
 import Combine
 
-/// Protocol định nghĩa các navigation actions cho Splash screen
+/// Protocol that defines navigation actions for Splash screen
 protocol SplashNavigationDelegate: AnyObject {
     func onFinish()
 }

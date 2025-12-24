@@ -5,7 +5,7 @@ import Core
 /// Detail Coordinator manages detail screen flow
 final class DetailCoordinator: BaseCoordinator {
     
-    // MARK: - Params nhận từ màn hình trước
+    // MARK: - Params received from previous screen
     private let itemName: String
     private let itemId: Int
     private let isFavorite: Bool
@@ -37,7 +37,7 @@ final class DetailCoordinator: BaseCoordinator {
     // MARK: - Start
     
     override func start() {
-        // Tạo ViewModel với params nhận được
+        // Create ViewModel with received params
         let viewModel = DetailViewModel(
             itemName: itemName,
             itemId: itemId,
@@ -46,13 +46,13 @@ final class DetailCoordinator: BaseCoordinator {
             metadata: metadata
         )
         
-        // Setup navigation callbacks (Delegate Pattern) nếu cần
+        // Setup navigation callbacks (Delegate Pattern) if needed
         // viewModel.onSomeAction = { [weak self] in ... }
         
-        // Tạo View với ViewModel
+        // Create View with ViewModel
         let detailView = DetailView(viewModel: viewModel)
         
-        // Push màn hình Detail
+        // Push Detail screen
         push(detailView)
     }
 }

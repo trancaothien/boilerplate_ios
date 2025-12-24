@@ -80,12 +80,12 @@ struct HomeView: View {
                         
                         // Params Passing Demo Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Truyền Params Demo")
+                            Text("Params Passing Demo")
                                 .font(.headline)
                                 .padding(.horizontal)
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Các loại params có thể truyền:")
+                                Text("Types of params that can be passed:")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                 
@@ -106,13 +106,13 @@ struct HomeView: View {
                         
                         // Items Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Items (Click để xem cách truyền params)")
+                            Text("Items (Click to see how to pass params)")
                                 .font(.headline)
                                 .padding(.horizontal)
                             
                             ForEach(viewModel.items) { item in
                                 Button {
-                                    // Truyền params từ Home sang Detail
+                                    // Pass params from Home to Detail
                                     viewModel.showDetail(for: item)
                                 } label: {
                                     HomeItemCard(
@@ -238,7 +238,7 @@ struct ModalDemoView: View {
                     Divider()
                     
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Cách sử dụng ModalConfiguration:")
+                        Text("How to use ModalConfiguration:")
                             .font(.headline)
                         
                         VStack(alignment: .leading, spacing: 12) {
@@ -249,7 +249,7 @@ func showModal() {
     present(view, configuration: .pageSheet)
 }
 
-// Các style có sẵn:
+// Available styles:
 - .default
 - .pageSheet (bottom sheet)
 - .fullScreen
@@ -271,7 +271,7 @@ present(view, configuration: config)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Đóng") {
+                    Button("Close") {
                         onDismiss()
                     }
                 }

@@ -9,11 +9,11 @@ struct DetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 // Header Section
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Chi tiết Item")
+                    Text("Item Detail")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
-                    Text("Đây là màn hình nhận params từ màn hình Home")
+                    Text("This screen receives params from Home screen")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -23,7 +23,7 @@ struct DetailView: View {
                 
                 // Params Display Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Params đã nhận:")
+                    Text("Received Params:")
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -91,7 +91,7 @@ struct DetailView: View {
                 
                 // Code Example Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Cách truyền params:")
+                    Text("How to pass params:")
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -128,7 +128,7 @@ func showDetail(
     detailCoordinator.start()
 }
 
-// 3. Trong Coordinator nhận params (DetailCoordinator):
+// 3. In Coordinator receiving params (DetailCoordinator):
 override func start() {
     let viewModel = DetailViewModel(
         itemName: itemName,
@@ -142,7 +142,7 @@ override func start() {
     push(detailView)
 }
 
-// 4. Trong ViewModel nhận params (DetailViewModel):
+// 4. In ViewModel receiving params (DetailViewModel):
 init(
     itemName: String,
     itemId: Int,

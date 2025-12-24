@@ -309,6 +309,12 @@ The app uses a coordinator pattern for navigation:
 - Feature Coordinators: Child coordinators for specific features
 - Each coordinator manages its own navigation stack
 
+📖 **See [Coordinator Pattern Guide](Documents/coordinator-guide.md) for complete documentation on:**
+- How to create new Views, ViewModels, and Coordinators
+- Navigation patterns (push, modal, params passing)
+- When to use Child Coordinator Management, Navigation Methods, and Modal Presentation
+- Best practices and troubleshooting
+
 See `.cursorrules` for detailed architecture guidelines.
 
 ## 🔧 Configuration
@@ -344,6 +350,7 @@ Use environment-specific code:
 
 ## 📚 Documentation
 
+- [Coordinator Pattern Guide](Documents/coordinator-guide.md) - Complete guide to using Coordinator pattern (MVVM-C)
 - [Configurations README](Configurations/README.md) - Environment configuration guide
 - [Firebase README](Configurations/Firebase/README.md) - Firebase setup guide
 - [Core Module README](Modules/Core/README.md) - Core module documentation

@@ -2,7 +2,7 @@ import Foundation
 import Core
 import Combine
 
-/// Protocol định nghĩa các navigation actions cho Home screen
+/// Protocol that defines navigation actions for Home screen
 protocol HomeNavigationDelegate: AnyObject {
     func showDetail(for item: Item)
     func showSettings()
@@ -93,8 +93,8 @@ final class HomeViewModel: BaseViewModel {
     
     // MARK: - Navigation Actions
     
-    /// Truyền params từ Home sang Detail
-    /// Có thể truyền nhiều loại params: String, Int, Bool, Date, Custom Object
+    /// Pass params from Home to Detail
+    /// Can pass multiple param types: String, Int, Bool, Date, Custom Object
     func showDetail(for item: Item) {
         navigationDelegate?.showDetail(for: item)
     }

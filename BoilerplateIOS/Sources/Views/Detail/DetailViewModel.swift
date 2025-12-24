@@ -2,14 +2,14 @@ import Foundation
 import Core
 import Combine
 
-/// Model để demo truyền custom object
+/// Model for demo passing custom object
 struct ItemMetadata: Codable {
     let category: String
     let tags: [String]
     let priority: String
 }
 
-/// Model Item để demo
+/// Item model for demo
 struct Item: Identifiable, Codable {
     let id: Int
     let name: String
@@ -19,7 +19,7 @@ struct Item: Identifiable, Codable {
 }
 
 final class DetailViewModel: BaseViewModel {
-    // MARK: - Params nhận từ màn hình trước
+    // MARK: - Params received from previous screen
     let itemName: String
     let itemId: Int
     let isFavorite: Bool
@@ -27,12 +27,12 @@ final class DetailViewModel: BaseViewModel {
     let metadata: ItemMetadata?
     
     // MARK: - Navigation Callbacks (Delegate Pattern)
-    // Note: DetailViewModel không có navigation actions hiện tại
-    // Nếu cần thêm navigation trong tương lai, thêm callbacks ở đây
+    // Note: DetailViewModel currently has no navigation actions
+    // If navigation is needed in the future, add callbacks here
     
     // MARK: - Initialization
     
-    /// Khởi tạo với params từ màn hình trước
+    /// Initialize with params from previous screen
     init(
         itemName: String,
         itemId: Int,
@@ -49,7 +49,7 @@ final class DetailViewModel: BaseViewModel {
     }
     
     override func setupBindings() {
-        // Setup bindings nếu cần
+        // Setup bindings if needed
     }
 }
 

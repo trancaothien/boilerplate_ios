@@ -2,7 +2,7 @@ import Foundation
 import Core
 import Combine
 
-/// Protocol định nghĩa các navigation actions cho Profile screen
+/// Protocol that defines navigation actions for Profile screen
 protocol ProfileNavigationDelegate: AnyObject {
     func editProfile()
 }
